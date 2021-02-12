@@ -71,7 +71,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -297755213
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 4d5dc2e0d09a5471d96639a6d9a151b7, type: 3}
   m_Color: {r: 0.1792453, g: 0.1792453, b: 0.1792453, a: 1}
@@ -97,7 +97,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.1853733}
+  m_Offset: {x: 0, y: -0.31590968}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -108,7 +108,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2, y: 1.252428}
+  m_Size: {x: 2, y: 0.9913553}
   m_EdgeRadius: 0
 --- !u!50 &546106019671509383
 Rigidbody2D:
@@ -145,3 +145,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shouldScroll: 0
   scrollSpeed: 0
+  vehicleSprites:
+  - {fileID: 21300000, guid: 4d5dc2e0d09a5471d96639a6d9a151b7, type: 3}
+  - {fileID: 21300000, guid: 81166572a62694893a22b9d98d987305, type: 3}
+  - {fileID: 21300000, guid: 20801abbe810f4310bb09e25c968a246, type: 3}
+  - {fileID: 21300000, guid: 45e44b65a2cb84da0afdff9f803843e2, type: 3}
+  - {fileID: 21300000, guid: ab4857074bf7c43c186a303cca5f3b46, type: 3}

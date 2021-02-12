@@ -21,5 +21,8 @@ public class Pickup : MonoBehaviour
                 new Vector2(12, transform.position.y),
                 scrollSpeed * Time.deltaTime);
         }
+        float distFromTop = Mathf.Abs(1 - transform.position.y);
+        float scale = (distFromTop / 4.5f * 0.15f) + 0.15f;
+        transform.localScale = new Vector3(scale, scale, scale);
     }
 }

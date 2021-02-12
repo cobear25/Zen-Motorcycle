@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Background : MonoBehaviour
 {
+    public GameController gameController;
     public float scrollSpeed;
     public float endX;
 
@@ -22,6 +23,10 @@ public class Background : MonoBehaviour
                 transform.position,
                 new Vector2(endX, transform.position.y),
                 scrollSpeed * Time.deltaTime);
+            if (transform.position.x >= endX)
+            {
+                gameController.EndReached();
+            }
         }
     }
 }

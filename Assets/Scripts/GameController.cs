@@ -49,7 +49,7 @@ public class GameController : MonoBehaviour
     void Update()
     {
         if (shouldScroll && repairMeter.sizeDelta.x > 0) {
-            repairMeter.sizeDelta = new Vector2(repairMeter.sizeDelta.x - 1f, repairMeter.sizeDelta.y);
+            repairMeter.sizeDelta = new Vector2(repairMeter.sizeDelta.x - 0.9f, repairMeter.sizeDelta.y);
             if (repairMeter.sizeDelta.x <= 0) {
                 ShouldScroll = false;
             }
@@ -89,5 +89,9 @@ public class GameController : MonoBehaviour
 
     public void WrenchPickedUp() {
         repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
+    }
+
+    public void EndReached() {
+        ShouldScroll = false;
     }
 }

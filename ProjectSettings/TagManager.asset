@@ -44,11 +44,11 @@ TagManager:
   - name: Background
     uniqueID: 398673119
     locked: 0
-  - name: Obstacle
-    uniqueID: 3997212083
-    locked: 0
   - name: Pickup
     uniqueID: 2906934079
+    locked: 0
+  - name: Obstacle
+    uniqueID: 3997212083
     locked: 0
   - name: Player
     uniqueID: 622863717

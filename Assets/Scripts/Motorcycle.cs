@@ -58,6 +58,10 @@ public class Motorcycle : MonoBehaviour
         {
             transform.position = new Vector2(transform.position.x, minY + 0.01f);
         }
+
+        float distFromTop = Mathf.Abs(maxY - transform.position.y);
+        float scale = (distFromTop / 4.5f * 0.15f) + 0.2f;
+        transform.localScale = new Vector3(scale, scale, scale);
     }
 
     void MoveWithMouse() {

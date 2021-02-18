@@ -11,32 +11,41 @@ public class Motorcycle : MonoBehaviour
     public float maxX;
     public float minX;
     public GameController gameController;
-    // Start is called before the first frame update
+    public ParticleSystem trackParticleSystem;
+    public ParticleSystem smokeParticleSystem;
+
+    // helps determine how much the motorcycle will scale up and down as it moves along the y-axis
+    public float scaleRangeMultiplier;
+    // the min scale for the motorcycle
+    public float bottomScaleBuffer;
+
+    float yRange;
+    bool canMove = true;
+
     void Start()
     {
         Application.targetFrameRate = 60;
+        yRange = Mathf.Abs(maxY - minY);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // MoveWithMouse();
+        if (!canMove) return;
+        // vertical movement
         var vertical = Input.GetAxis("Vertical"); 
         if (vertical > 0) {
             transform.position = Vector2.MoveTowards(
                 transform.position,
                 new Vector2(transform.position.x, maxY),
                 vSpeed * vertical * Time.deltaTime); 
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, -8 * vertical));
         } else if (vertical < 0) {
             transform.position = Vector2.MoveTowards(
                 transform.position,
                 new Vector2(transform.position.x, minY),
                 vSpeed * -vertical * Time.deltaTime); 
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, 8 * -vertical));
-        } else {
-            transform.rotation = Quaternion.identity;
         }
+
+        // horizontal movement
         var horizontal = Input.GetAxis("Horizontal"); 
         if (horizontal > 0) {
             transform.position = Vector2.MoveTowards(
@@ -50,6 +59,30 @@ public class Motorcycle : MonoBehaviour
                 hSpeed * -horizontal * Time.deltaTime); 
         }
 
+        var emission = trackParticleSystem.emission;
+        emission.rateOverTime = 20 * (-horizontal + 1.1f);
+
+        // handle rotation
+        float h = horizontal;
+        // ensure that there's always rotation even if horizontal is zero
+        if (h == 0) h = -1f;
+        if (vertical > 0 && horizontal <= 0) {
+            // front up
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, -8 * vertical * -h));
+        } else if (vertical > 0 && horizontal > 0) {
+            // front down
+           transform.rotation = Quaternion.Euler(new Vector3(0, 0, 8 * vertical * h));
+        } else if (vertical < 0 && horizontal <= 0) {
+            // front down
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, -8 * vertical * -h));
+        } else if (vertical < 0 && horizontal > 0) {
+            // front up
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, 8 * vertical * h));
+        } else {
+            // no vertical movement, stay straight.
+            transform.rotation = Quaternion.identity;
+        }
+
         if (transform.position.y > maxY) 
         {
             transform.position = new Vector2(transform.position.x, maxY - 0.01f);
@@ -60,7 +93,7 @@ public class Motorcycle : MonoBehaviour
         }
 
         float distFromTop = Mathf.Abs(maxY - transform.position.y);
-        float scale = (distFromTop / 4.5f * 0.15f) + 0.2f;
+        float scale = (distFromTop / yRange * scaleRangeMultiplier) + bottomScaleBuffer;
         transform.localScale = new Vector3(scale, scale, scale);
     }
 
@@ -97,9 +130,13 @@ public class Motorcycle : MonoBehaviour
         }
     }
 
+    public void BrokenDown() {
+        gameController.ObstacleHit();
+    }
+
     void OnCollisionEnter2D(Collision2D col)
     {
-        Debug.Log("OnCollisionEnter2D");    
+        gameController.ObstacleHit();
     }
 
     void OnTriggerEnter2D(Collider2D col) {
@@ -107,5 +144,19 @@ public class Motorcycle : MonoBehaviour
         col.enabled = false;
         col.gameObject.GetComponent<ParticleSystem>().Stop();
         gameController.WrenchPickedUp();
+    }
+
+    public void StopMoving() {
+        canMove = false;
+        trackParticleSystem.Stop();
+        var shape = smokeParticleSystem.shape;
+        shape.rotation = new Vector3(0, 0, -transform.rotation.eulerAngles.z);
+        smokeParticleSystem.Play();
+    }
+
+    public void Repare() {
+        canMove = true;
+        trackParticleSystem.Play();
+        smokeParticleSystem.Stop();
     }
 }

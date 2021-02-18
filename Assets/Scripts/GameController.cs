@@ -6,10 +6,17 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     [Header("UI")]
+    public RectTransform canvasRectTransform;
     public RectTransform repairMeter;
     public float maxMeterWidth;
+    public GridLayoutGroup puzzleGrid;
+    public GameObject puzzlePiecePrefab;
+
+    public GameObject repairIcon;
+    public GameObject repairMeterWrapper;
 
     [Header("Gameplay")]
+    public Motorcycle motorcycle;
     public GameObject obstaclePrefab;
     public GameObject pickupPrefab;
     public Background background;
@@ -18,6 +25,10 @@ public class GameController : MonoBehaviour
     public float obstacleMinY;
     public float obstacleSpawnRate;
     private bool shouldScroll;
+
+    int puzzleRows = 3;
+    int puzzleCols = 4;
+
     public bool ShouldScroll {
         set {
             shouldScroll = value;
@@ -30,6 +41,7 @@ public class GameController : MonoBehaviour
             {
                 item.GetComponent<Pickup>().shouldScroll = value; 
             }
+            if (!value) motorcycle.StopMoving();
         }
         get {
             return shouldScroll;
@@ -51,7 +63,7 @@ public class GameController : MonoBehaviour
         if (shouldScroll && repairMeter.sizeDelta.x > 0) {
             repairMeter.sizeDelta = new Vector2(repairMeter.sizeDelta.x - 0.9f, repairMeter.sizeDelta.y);
             if (repairMeter.sizeDelta.x <= 0) {
-                ShouldScroll = false;
+                motorcycle.BrokenDown();
             }
         }
     }
@@ -84,7 +96,8 @@ public class GameController : MonoBehaviour
     }
 
     public void ObstacleHit() {
-
+        ShouldScroll = false;
+        Invoke("GetScreenshot", 1);
     }
 
     public void WrenchPickedUp() {
@@ -93,5 +106,114 @@ public class GameController : MonoBehaviour
 
     public void EndReached() {
         ShouldScroll = false;
+    }
+
+    void GetScreenshot() {
+        repairMeterWrapper.SetActive(false);
+        repairIcon.SetActive(false);
+        System.IO.File.Delete("screenshot.png");
+        ScreenCapture.CaptureScreenshot("screenshot.png");
+        Invoke("LoadScreenshot", 0.5f);
+    }
+
+    void LoadScreenshot() {
+        repairMeterWrapper.SetActive(true);
+        repairIcon.SetActive(true);
+
+        int imageHeight = Screen.height;
+        int imageWidth = Screen.width;
+
+        byte[] fileData = System.IO.File.ReadAllBytes("screenshot.png");
+        Texture2D tex2d = new Texture2D(imageWidth, imageHeight);
+        tex2d.LoadImage(fileData);
+
+        puzzleGrid.cellSize = new Vector2(canvasRectTransform.rect.width / puzzleCols, canvasRectTransform.rect.height / puzzleRows);
+        float cutoutWidth = imageWidth / puzzleCols;
+        float cutoutHeight = imageHeight / puzzleRows;
+        List<Sprite> spritePieces = new List<Sprite>();
+        for (int row = 0; row < puzzleRows; row++)
+        {
+            for (int col = 0; col < puzzleCols; col++)
+            {
+                Sprite newSprite = Sprite.Create(tex2d, new Rect(col * cutoutWidth, imageHeight - (row * cutoutHeight) - cutoutHeight, cutoutWidth, cutoutHeight), Vector2.zero);
+                // Sprite newSprite = Sprite.Create(tex2d, new Rect(0, 0, cutoutWidth, cutoutHeight), Vector2.zero);
+                spritePieces.Add(newSprite);
+            }
+        }
+        foreach (var sprite in spritePieces)
+        {
+            var piece = Instantiate(puzzlePiecePrefab);
+            piece.transform.parent = puzzleGrid.transform;
+            piece.GetComponent<Image>().sprite = sprite;
+            piece.GetComponent<Tag>().value = spritePieces.IndexOf(sprite);
+            piece.GetComponent<Button>().onClick.AddListener(delegate { CellClicked(piece); });
+        }
+        puzzleGrid.gameObject.SetActive(true);
+        Invoke("ShufflePuzzle", 1f);
+    }
+
+    GameObject clickedCell; 
+    void CellClicked(GameObject cell)
+    {
+        cell.GetComponent<Image>().color = Color.yellow;
+        if (clickedCell != null) {
+            // swap this cell and clickedCell
+            var newIndex = cell.transform.GetSiblingIndex();
+            var oldIndex = clickedCell.transform.GetSiblingIndex();
+            clickedCell.transform.SetSiblingIndex(newIndex);
+            cell.transform.SetSiblingIndex(oldIndex);
+            cell.GetComponent<Image>().color = Color.white;
+            clickedCell.GetComponent<Image>().color = Color.white;
+            clickedCell = null;
+            // check for a win
+            CheckForPuzzleWin();
+        } else {
+            // set this cell as the one to swap with
+            clickedCell = cell;
+        }
+    }
+
+    void ShufflePuzzle() {
+        int count = puzzleGrid.transform.childCount;
+        for (int i = 0; i < count; i++)
+        {
+            // var temp = puzzleGrid.transform.GetChild(i).GetComponent<Image>().sprite;
+            // var rand = Random.Range(0, count - 1);
+            // var other = puzzleGrid.transform.GetChild(rand).GetComponent<Image>().sprite;
+            // puzzleGrid.transform.GetChild(i).GetComponent<Image>().sprite = other;
+            // puzzleGrid.transform.GetChild(rand).GetComponent<Image>().sprite = temp;
+            var temp = puzzleGrid.transform.GetChild(i);
+            var rand = Random.Range(0, count - 1);
+            puzzleGrid.transform.GetChild(rand).SetSiblingIndex(i);
+            if (i < count - 1) {
+                puzzleGrid.transform.GetChild(i + 1).SetSiblingIndex(rand);
+            }
+        }
+    }
+
+    void CheckForPuzzleWin() {
+        bool allInPlace = true;
+        foreach (Transform cell in puzzleGrid.transform)
+        {
+            if (cell.GetComponent<Tag>().value != cell.transform.GetSiblingIndex()) {
+                allInPlace = false;
+            } 
+        }
+        if (allInPlace) {
+            foreach (Transform cell in puzzleGrid.transform)
+            {
+                Destroy(cell.gameObject);   
+            }
+            puzzleGrid.gameObject.SetActive(false);
+            foreach (var item in obstacles)
+            {
+                Destroy(item.gameObject); 
+            }
+            obstacles.Clear();
+            motorcycle.Repare();
+            ShouldScroll = true;
+            repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
+            StartSpawningObstacles();
+        }
     }
 }

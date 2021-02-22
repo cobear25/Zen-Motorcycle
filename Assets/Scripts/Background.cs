@@ -5,6 +5,7 @@ using UnityEngine;
 public class Background : MonoBehaviour
 {
     public GameController gameController;
+    public SpriteRenderer spriteRenderer;
     public float scrollSpeed;
     public float endX;
 
@@ -12,7 +13,6 @@ public class Background : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -27,6 +27,30 @@ public class Background : MonoBehaviour
             {
                 gameController.EndReached();
             }
+        }
+    }
+
+    public void StartFadeIn() {
+        StartCoroutine(FadeTo(1.0f, 8.0f));
+    }
+
+    public void StartFadeOut() {
+        StartCoroutine(FadeTo(0.0f, 8.0f));
+        Invoke("ResetPosition", 8.2f);
+    }
+
+    void ResetPosition() {
+        transform.position = new Vector2(-6.5f, transform.position.y);
+    }
+
+    IEnumerator FadeTo(float newAlpha, float duration)
+    {
+        float alpha = spriteRenderer.color.a;
+        for (float t = 0.0f; t < 1.0f; t += Time.deltaTime / duration)
+        {
+            Color newColor = new Color(1, 1, 1, Mathf.Lerp(alpha, newAlpha, t));
+            spriteRenderer.color = newColor;
+            yield return null;
         }
     }
 }

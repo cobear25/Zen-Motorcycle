@@ -19,4 +19,8 @@ public class RoadLines : MonoBehaviour
             transform.position = new Vector2(transform.position.x + (moveSpeed * Time.deltaTime), transform.position.y);
         }
     }
+
+    public void Reset() {
+        transform.position = new Vector2(-2.86f, transform.position.y);
+    }
 }

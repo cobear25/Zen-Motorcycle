@@ -20,7 +20,7 @@ public class Motorcycle : MonoBehaviour
     public float bottomScaleBuffer;
 
     float yRange;
-    bool canMove = true;
+    bool canMove = false;
 
     void Start()
     {
@@ -158,5 +158,9 @@ public class Motorcycle : MonoBehaviour
         canMove = true;
         trackParticleSystem.Play();
         smokeParticleSystem.Stop();
+    }
+
+    public void EnableMovement() {
+        canMove = true;
     }
 }

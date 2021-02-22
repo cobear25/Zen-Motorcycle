@@ -15,35 +15,46 @@ public class GameController : MonoBehaviour
     public GameObject repairIcon;
     public GameObject repairMeterWrapper;
 
+    public FadeText quoteText;
+    public FadeText stateText;
+
     [Header("Gameplay")]
     public Motorcycle motorcycle;
     public GameObject obstaclePrefab;
     public GameObject pickupPrefab;
     public Background background;
+    public RoadLines roadLines;
     public float obstacleStartX;
     public float obstacleMaxY;
     public float obstacleMinY;
     public float obstacleSpawnRate;
+    public float pickupSpawnRate;
     private bool shouldScroll;
+    public int level = 1; 
 
     int puzzleRows = 3;
     int puzzleCols = 4;
+    bool endReached = false;
 
     public bool ShouldScroll {
         set {
             shouldScroll = value;
             background.shouldScroll = value;
-            foreach (var item in obstacles)
+            if (!endReached)
             {
-                item.GetComponent<Obstacle>().shouldScroll = value; 
+                foreach (var item in obstacles)
+                {
+                    item.GetComponent<Obstacle>().shouldScroll = value;
+                }
+                foreach (var item in pickups)
+                {
+                    item.GetComponent<Pickup>().shouldScroll = value;
+                }
+                if (!value) motorcycle.StopMoving();
             }
-            foreach (var item in pickups)
-            {
-                item.GetComponent<Pickup>().shouldScroll = value; 
-            }
-            if (!value) motorcycle.StopMoving();
         }
-        get {
+        get
+        {
             return shouldScroll;
         }
     }
@@ -54,7 +65,8 @@ public class GameController : MonoBehaviour
     void Start()
     {
         ShouldScroll = true;
-        StartSpawningObstacles();
+        repairMeter.sizeDelta = new Vector2(0, repairMeter.sizeDelta.y);
+        StartLevel();
     }
 
     // Update is called once per frame
@@ -72,26 +84,32 @@ public class GameController : MonoBehaviour
         SpawnObstacle();
     }
 
-    private bool shouldSwitch = true;
+    public void StartSpawningPickups() {
+        SpawnPickup();
+    }
+
     void SpawnObstacle() {
         if (shouldScroll)
         {
-            if (shouldSwitch) {
-                Obstacle obstacle = Instantiate(obstaclePrefab).GetComponent<Obstacle>();
-                obstacle.transform.position = new Vector2(obstacleStartX, Random.Range(obstacleMinY, obstacleMaxY));
-                obstacle.shouldScroll = true;
-                obstacle.scrollSpeed = Random.Range(2.0f, 3.0f);
-                obstacles.Add(obstacle);
-                Invoke("SpawnObstacle", obstacleSpawnRate / 2);
-            } else {
-                Pickup pickup = Instantiate(pickupPrefab).GetComponent<Pickup>();
-                pickup.transform.position = new Vector2(obstacleStartX, Random.Range(obstacleMinY, obstacleMaxY));
-                pickup.shouldScroll = true;
-                pickup.scrollSpeed = 5;
-                pickups.Add(pickup);
-                Invoke("SpawnObstacle", obstacleSpawnRate);
-            }
-            shouldSwitch = !shouldSwitch;
+            Obstacle obstacle = Instantiate(obstaclePrefab).GetComponent<Obstacle>();
+            obstacle.transform.position = new Vector2(obstacleStartX, Random.Range(obstacleMinY, obstacleMaxY));
+            obstacle.shouldScroll = true;
+            obstacle.scrollSpeed = Random.Range(2.0f, 3.0f);
+            obstacles.Add(obstacle);
+            Invoke("SpawnObstacle", obstacleSpawnRate);
+        }
+    }
+
+    void SpawnPickup()
+    {
+        if (shouldScroll)
+        {
+            Pickup pickup = Instantiate(pickupPrefab).GetComponent<Pickup>();
+            pickup.transform.position = new Vector2(obstacleStartX, Random.Range(obstacleMinY, obstacleMaxY));
+            pickup.shouldScroll = true;
+            pickup.scrollSpeed = 5;
+            pickups.Add(pickup);
+            Invoke("SpawnPickup", pickupSpawnRate);
         }
     }
 
@@ -105,7 +123,11 @@ public class GameController : MonoBehaviour
     }
 
     public void EndReached() {
+        endReached = true;
         ShouldScroll = false;
+        background.StartFadeOut();
+        level = 1;
+        Invoke("StartLevel", 5);
     }
 
     void GetScreenshot() {
@@ -214,6 +236,43 @@ public class GameController : MonoBehaviour
             ShouldScroll = true;
             repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
             StartSpawningObstacles();
+            StartSpawningPickups();
+        }
+    }
+
+    void StartLevel() {
+        SetUpLevel();
+        quoteText.FadeIn();
+        Invoke("StartGameplay", 5);
+    }
+
+    void StartGameplay() {
+        ShouldScroll = true;
+        StartSpawningObstacles();
+        StartSpawningPickups();
+        motorcycle.EnableMovement();
+        background.StartFadeIn();
+        background.shouldScroll = true;
+        roadLines.Reset();
+        repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
+        stateText.FadeIn();
+        Invoke("FadeOutStateText", 10);
+        FadeOutQuoteText();
+    }
+
+    void FadeOutStateText() {
+        stateText.FadeOut();
+    }
+
+    void FadeOutQuoteText() {
+        quoteText.FadeOut();
+    }
+
+    void SetUpLevel() {
+        if (level == 1) {
+            puzzleRows = 2;
+            puzzleCols = 3;
+            obstacleSpawnRate = 8;
         }
     }
 }

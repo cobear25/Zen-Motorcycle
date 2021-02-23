@@ -145,6 +145,10 @@ public class GameController : MonoBehaviour
     void LoadScreenshot() {
         repairMeterWrapper.SetActive(true);
         repairIcon.SetActive(true);
+        quoteText.gameObject.SetActive(false);
+        stateText.gameObject.SetActive(false);
+        // set the meter to zero so that it can keep track of puzzle pieces in place
+        repairMeter.sizeDelta = new Vector2(0, repairMeter.sizeDelta.y);
 
         int imageHeight = Screen.height;
         int imageWidth = Screen.width;
@@ -180,8 +184,17 @@ public class GameController : MonoBehaviour
     }
 
     GameObject clickedCell; 
+    GameObject inPlaceCell; 
     void CellClicked(GameObject cell)
     {
+        // don't do anything if cell in place
+        if (cell.GetComponent<Tag>().value == cell.transform.GetSiblingIndex()) {
+            cell.GetComponent<Image>().color = Color.green;
+            inPlaceCell = cell;
+            Invoke("DecolorInPlaceCell", 0.1f);
+            return;
+        }
+
         cell.GetComponent<Image>().color = Color.yellow;
         if (clickedCell != null) {
             // swap this cell and clickedCell
@@ -200,6 +213,10 @@ public class GameController : MonoBehaviour
         }
     }
 
+    void DecolorInPlaceCell() {
+        inPlaceCell.GetComponent<Image>().color = Color.white;
+    }
+
     void ShufflePuzzle() {
         int count = puzzleGrid.transform.childCount;
         for (int i = 0; i < count; i++)
@@ -216,16 +233,22 @@ public class GameController : MonoBehaviour
                 puzzleGrid.transform.GetChild(i + 1).SetSiblingIndex(rand);
             }
         }
+        CheckForPuzzleWin();
     }
 
     void CheckForPuzzleWin() {
         bool allInPlace = true;
+        int inPlace = 0;
         foreach (Transform cell in puzzleGrid.transform)
         {
             if (cell.GetComponent<Tag>().value != cell.transform.GetSiblingIndex()) {
                 allInPlace = false;
-            } 
+            } else {
+                inPlace++;
+            }
         }
+        float percentDone = (float)inPlace/(float)puzzleGrid.transform.childCount;
+        repairMeter.sizeDelta = new Vector2(maxMeterWidth * percentDone, repairMeter.sizeDelta.y);
         if (allInPlace) {
             foreach (Transform cell in puzzleGrid.transform)
             {
@@ -248,6 +271,7 @@ public class GameController : MonoBehaviour
     void StartLevel() {
         endReached = false;
         SetUpLevel();
+        quoteText.gameObject.SetActive(true);
         quoteText.FadeIn();
         Invoke("StartGameplay", 5);
     }
@@ -261,6 +285,7 @@ public class GameController : MonoBehaviour
         background.shouldScroll = true;
         roadLines.Reset();
         repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
+        stateText.gameObject.SetActive(true);
         stateText.FadeIn();
         Invoke("FadeOutStateText", 10);
         FadeOutQuoteText();

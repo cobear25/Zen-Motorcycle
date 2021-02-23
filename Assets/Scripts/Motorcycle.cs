@@ -103,7 +103,7 @@ public class Motorcycle : MonoBehaviour
 
     void LateUpdate() {
         spriteRenderer.sortingOrder = (int)-transform.position.y;
-        manSpriteRenderer.sortingOrder = (int)-transform.position.y;
+        manSpriteRenderer.sortingOrder = (int)-transform.position.y + 1;
     }
 
     void MoveWithMouse() {

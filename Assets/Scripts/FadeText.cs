@@ -13,11 +13,18 @@ public class FadeText : MonoBehaviour
     }
 
     public void FadeIn() {
-        StartCoroutine(FadeTo(1.0f, 8.0f));
+        text.color = new Color(0, 0, 0, 0);
+        if (text.isActiveAndEnabled) {
+            StartCoroutine(FadeTo(1.0f, 8.0f));
+        }
     }
 
     public void FadeOut() {
-        StartCoroutine(FadeTo(0.0f, 8.0f));
+        text.color = new Color(0, 0, 0, 1);
+        if (text.isActiveAndEnabled)
+        {
+            StartCoroutine(FadeTo(0.0f, 8.0f));
+        }
     }
 
     IEnumerator FadeTo(float newAlpha, float duration)

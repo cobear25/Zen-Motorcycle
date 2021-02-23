@@ -1,21 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿    // minnesota
+    // Photo by Aaron Huber on Unsplash
 
-public class PhotoAttribution : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    // north dakota
+    // Photo by Linhao Zhang on Unsplash
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // montana
+    // Photo by Nathaniel Krum on Unsplash
 
-// montana
-   // Photo by Nathaniel Krum on Unsplash
-}
+    // idaho
+    // Photo by C. Z. Shi on Unsplash
+
+    // oregon
+    // Photo by Eric Muhr on Unsplash
+
+    // california
+    // Photo by Ronan Furuta on Unsplash

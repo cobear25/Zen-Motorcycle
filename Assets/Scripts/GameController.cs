@@ -23,6 +23,7 @@ public class GameController : MonoBehaviour
     public GameObject obstaclePrefab;
     public GameObject pickupPrefab;
     public Background background;
+    public Sprite[] backgroundSprites;
     public RoadLines roadLines;
     public float obstacleStartX;
     public float obstacleMaxY;
@@ -35,6 +36,8 @@ public class GameController : MonoBehaviour
     int puzzleRows = 3;
     int puzzleCols = 4;
     bool endReached = false;
+    float obstacleMinSpeed = 2f;
+    float obstacleMaxSpeed = 3f;
 
     public bool ShouldScroll {
         set {
@@ -88,13 +91,18 @@ public class GameController : MonoBehaviour
         SpawnPickup();
     }
 
+    public void PickupPickedUp(Pickup pickup) {
+        pickups.Remove(pickup);
+        repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
+    }
+
     void SpawnObstacle() {
         if (shouldScroll)
         {
             Obstacle obstacle = Instantiate(obstaclePrefab).GetComponent<Obstacle>();
             obstacle.transform.position = new Vector2(obstacleStartX, Random.Range(obstacleMinY, obstacleMaxY));
             obstacle.shouldScroll = true;
-            obstacle.scrollSpeed = Random.Range(2.0f, 3.0f);
+            obstacle.scrollSpeed = Random.Range(obstacleMinSpeed, obstacleMaxSpeed);
             obstacles.Add(obstacle);
             Invoke("SpawnObstacle", obstacleSpawnRate);
         }
@@ -118,15 +126,11 @@ public class GameController : MonoBehaviour
         Invoke("GetScreenshot", 1);
     }
 
-    public void WrenchPickedUp() {
-        repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
-    }
-
     public void EndReached() {
         endReached = true;
         ShouldScroll = false;
         background.StartFadeOut();
-        level = 1;
+        level++;
         Invoke("StartLevel", 5);
     }
 
@@ -166,6 +170,7 @@ public class GameController : MonoBehaviour
         {
             var piece = Instantiate(puzzlePiecePrefab);
             piece.transform.parent = puzzleGrid.transform;
+            piece.transform.localScale = Vector2.one;
             piece.GetComponent<Image>().sprite = sprite;
             piece.GetComponent<Tag>().value = spritePieces.IndexOf(sprite);
             piece.GetComponent<Button>().onClick.AddListener(delegate { CellClicked(piece); });
@@ -241,6 +246,7 @@ public class GameController : MonoBehaviour
     }
 
     void StartLevel() {
+        endReached = false;
         SetUpLevel();
         quoteText.FadeIn();
         Invoke("StartGameplay", 5);
@@ -269,10 +275,48 @@ public class GameController : MonoBehaviour
     }
 
     void SetUpLevel() {
+        background.GetComponent<SpriteRenderer>().sprite = backgroundSprites[level - 1];
         if (level == 1) {
             puzzleRows = 2;
             puzzleCols = 3;
+            obstacleSpawnRate = 12;
+            obstacleMinSpeed = 2f;
+            obstacleMaxSpeed = 3f;
+        }
+        if (level == 2) {
+            puzzleRows = 3;
+            puzzleCols = 3;
+            obstacleSpawnRate = 10;
+            obstacleMinSpeed = 3f;
+            obstacleMaxSpeed = 4f;
+        }
+        if (level == 3) {
+            puzzleRows = 3;
+            puzzleCols = 4;
             obstacleSpawnRate = 8;
+            obstacleMinSpeed = 3f;
+            obstacleMaxSpeed = 5f;
+        }
+        if (level == 4) {
+            puzzleRows = 4;
+            puzzleCols = 4;
+            obstacleSpawnRate = 6;
+            obstacleMinSpeed = 3.5f;
+            obstacleMaxSpeed = 5.5f;
+        }
+        if (level == 5) {
+            puzzleRows = 4;
+            puzzleCols = 5;
+            obstacleSpawnRate = 8;
+            obstacleMinSpeed = 4f;
+            obstacleMaxSpeed = 6f;
+        }
+        if (level == 6) {
+            puzzleRows = 4;
+            puzzleCols = 6;
+            obstacleSpawnRate = 7;
+            obstacleMinSpeed = 5.5f;
+            obstacleMaxSpeed = 7.5f;
         }
     }
 }

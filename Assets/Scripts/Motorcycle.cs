@@ -19,6 +19,9 @@ public class Motorcycle : MonoBehaviour
     // the min scale for the motorcycle
     public float bottomScaleBuffer;
 
+    SpriteRenderer spriteRenderer;
+    public SpriteRenderer manSpriteRenderer;
+
     float yRange;
     bool canMove = false;
 
@@ -26,6 +29,7 @@ public class Motorcycle : MonoBehaviour
     {
         Application.targetFrameRate = 60;
         yRange = Mathf.Abs(maxY - minY);
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -97,6 +101,11 @@ public class Motorcycle : MonoBehaviour
         transform.localScale = new Vector3(scale, scale, scale);
     }
 
+    void LateUpdate() {
+        spriteRenderer.sortingOrder = (int)-transform.position.y;
+        manSpriteRenderer.sortingOrder = (int)-transform.position.y;
+    }
+
     void MoveWithMouse() {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (transform.position.y < maxY && transform.position.y > minY)
@@ -143,7 +152,9 @@ public class Motorcycle : MonoBehaviour
         col.GetComponent<SpriteRenderer>().enabled = false;
         col.enabled = false;
         col.gameObject.GetComponent<ParticleSystem>().Stop();
-        gameController.WrenchPickedUp();
+        var pickup = col.GetComponent<Pickup>();
+        pickup.PickedUp();
+        gameController.PickupPickedUp(pickup);
     }
 
     public void StopMoving() {

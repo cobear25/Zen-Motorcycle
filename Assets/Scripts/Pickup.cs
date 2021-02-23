@@ -25,4 +25,8 @@ public class Pickup : MonoBehaviour
         float scale = (distFromTop / 4.5f * 0.15f) + 0.15f;
         transform.localScale = new Vector3(scale, scale, scale);
     }
+
+    public void PickedUp() {
+        Destroy(gameObject, 10f);
+    }
 }

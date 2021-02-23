@@ -35,7 +35,7 @@ public class Background : MonoBehaviour
     }
 
     public void StartFadeOut() {
-        StartCoroutine(FadeTo(0.0f, 8.0f));
+        StartCoroutine(FadeTo(0.0f, 4.0f));
         Invoke("ResetPosition", 8.2f);
     }
 

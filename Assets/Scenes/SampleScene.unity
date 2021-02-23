@@ -269,8 +269,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 622863717
-  m_SortingLayer: 4
+  m_SortingLayerID: -297755213
+  m_SortingLayer: 3
   m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 9762106054e5a4eddbfa27b20ce55d2d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -671,8 +671,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 622863717
-  m_SortingLayer: 4
+  m_SortingLayerID: -297755213
+  m_SortingLayer: 3
   m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: d77283b302d144e0b933b2fc61fb54cf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -744,6 +744,7 @@ MonoBehaviour:
   smokeParticleSystem: {fileID: 334368873}
   scaleRangeMultiplier: 0.1
   bottomScaleBuffer: 0.2
+  manSpriteRenderer: {fileID: 24079473}
 --- !u!61 &78603574
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -839,12 +840,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 800, y: 800}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -15962,7 +15963,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 100, y: 100}
+  m_CellSize: {x: 100.69, y: 100}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -16553,6 +16554,13 @@ MonoBehaviour:
   pickupPrefab: {fileID: 7420382256758523649, guid: fa1675492a9494d28a35b8c10f94cd6c,
     type: 3}
   background: {fileID: 738955827}
+  backgroundSprites:
+  - {fileID: 21300000, guid: 7b6bd925bc39541cc8efb09c8c6cfee4, type: 3}
+  - {fileID: 21300000, guid: ce54f508babdd40b9a9b46ec384e8167, type: 3}
+  - {fileID: 21300000, guid: 6582acc17699449b685fdc88e8eca97b, type: 3}
+  - {fileID: 21300000, guid: e5650691acebd4d00ba04173a7714e95, type: 3}
+  - {fileID: 21300000, guid: 6b343fca8ba174df1be964f0f21fc87f, type: 3}
+  - {fileID: 21300000, guid: fc200b2807d484a2180477420b42f460, type: 3}
   roadLines: {fileID: 2118970452}
   obstacleStartX: -12
   obstacleMaxY: 1

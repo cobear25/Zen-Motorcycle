@@ -14,10 +14,12 @@ public class Obstacle : MonoBehaviour
     public float bottomScaleBuffer;
 
     float yRange = 4.23f;
-    // Start is called before the first frame update
+    SpriteRenderer spriteRenderer;
+
     void Start()
     {
-        GetComponent<SpriteRenderer>().sprite = vehicleSprites[Random.Range(0, vehicleSprites.Length - 1)];
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = vehicleSprites[Random.Range(0, vehicleSprites.Length - 1)];
     }
 
     // Update is called once per frame
@@ -32,5 +34,10 @@ public class Obstacle : MonoBehaviour
         float distFromTop = Mathf.Abs(1 - transform.position.y);
         float scale = (distFromTop / yRange * scaleRangeMultiplier) + bottomScaleBuffer;
         transform.localScale = new Vector3(scale, scale, scale);
+    }
+
+    void LateUpdate()
+    {
+        spriteRenderer.sortingOrder = (int)-transform.position.y;
     }
 }

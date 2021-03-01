@@ -13,6 +13,8 @@ public class Motorcycle : MonoBehaviour
     public GameController gameController;
     public ParticleSystem trackParticleSystem;
     public ParticleSystem smokeParticleSystem;
+    public AudioSource audioSource;
+    public AudioClip audioClip;
 
     // helps determine how much the motorcycle will scale up and down as it moves along the y-axis
     public float scaleRangeMultiplier;
@@ -145,6 +147,7 @@ public class Motorcycle : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
+        audioSource.PlayOneShot(audioClip);
         gameController.ObstacleHit();
     }
 

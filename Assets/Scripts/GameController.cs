@@ -17,6 +17,9 @@ public class GameController : MonoBehaviour
 
     public FadeText quoteText;
     public FadeText stateText;
+    public FadeText titleText;
+    public FadeText subtitleText;
+    public FadeText endText;
 
     [Header("Gameplay")]
     public Motorcycle motorcycle;
@@ -67,9 +70,11 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ShouldScroll = true;
+        // ShouldScroll = true;
         repairMeter.sizeDelta = new Vector2(0, repairMeter.sizeDelta.y);
-        StartLevel();
+        // StartLevel();
+        Invoke("StartLevel", 2);
+        Invoke("StartSpawningObstacles", 7);
     }
 
     // Update is called once per frame
@@ -104,8 +109,8 @@ public class GameController : MonoBehaviour
             obstacle.shouldScroll = true;
             obstacle.scrollSpeed = Random.Range(obstacleMinSpeed, obstacleMaxSpeed);
             obstacles.Add(obstacle);
-            Invoke("SpawnObstacle", obstacleSpawnRate);
         }
+        Invoke("SpawnObstacle", obstacleSpawnRate);
     }
 
     void SpawnPickup()
@@ -131,7 +136,11 @@ public class GameController : MonoBehaviour
         ShouldScroll = false;
         background.StartFadeOut();
         level++;
-        Invoke("StartLevel", 5);
+        if (level > 6) {
+            endText.FadeIn();
+        } else {
+            Invoke("StartLevel", 5);
+        }
     }
 
     void GetScreenshot() {
@@ -184,14 +193,10 @@ public class GameController : MonoBehaviour
     }
 
     GameObject clickedCell; 
-    GameObject inPlaceCell; 
     void CellClicked(GameObject cell)
     {
         // don't do anything if cell in place
         if (cell.GetComponent<Tag>().value == cell.transform.GetSiblingIndex()) {
-            cell.GetComponent<Image>().color = Color.green;
-            inPlaceCell = cell;
-            Invoke("DecolorInPlaceCell", 0.1f);
             return;
         }
 
@@ -204,6 +209,14 @@ public class GameController : MonoBehaviour
             cell.transform.SetSiblingIndex(oldIndex);
             cell.GetComponent<Image>().color = Color.white;
             clickedCell.GetComponent<Image>().color = Color.white;
+            if (cell.GetComponent<Tag>().value == cell.transform.GetSiblingIndex())
+            {
+                cell.GetComponent<PuzzleCell>().MarkInPlace();
+            }
+            if (clickedCell.GetComponent<Tag>().value == clickedCell.transform.GetSiblingIndex())
+            {
+                clickedCell.GetComponent<PuzzleCell>().MarkInPlace();
+            }
             clickedCell = null;
             // check for a win
             CheckForPuzzleWin();
@@ -211,10 +224,6 @@ public class GameController : MonoBehaviour
             // set this cell as the one to swap with
             clickedCell = cell;
         }
-    }
-
-    void DecolorInPlaceCell() {
-        inPlaceCell.GetComponent<Image>().color = Color.white;
     }
 
     void ShufflePuzzle() {
@@ -231,6 +240,12 @@ public class GameController : MonoBehaviour
             puzzleGrid.transform.GetChild(rand).SetSiblingIndex(i);
             if (i < count - 1) {
                 puzzleGrid.transform.GetChild(i + 1).SetSiblingIndex(rand);
+            }
+        }
+        foreach (Transform cell in puzzleGrid.transform)
+        {
+            if (cell.GetComponent<Tag>().value == cell.transform.GetSiblingIndex()) {
+                cell.GetComponent<PuzzleCell>().MarkInPlace();
             }
         }
         CheckForPuzzleWin();
@@ -263,7 +278,7 @@ public class GameController : MonoBehaviour
             motorcycle.Repare();
             ShouldScroll = true;
             repairMeter.sizeDelta = new Vector2(maxMeterWidth, repairMeter.sizeDelta.y);
-            StartSpawningObstacles();
+            // StartSpawningObstacles();
             StartSpawningPickups();
         }
     }
@@ -278,7 +293,9 @@ public class GameController : MonoBehaviour
 
     void StartGameplay() {
         ShouldScroll = true;
-        StartSpawningObstacles();
+        // if (level == 1) {
+        //     StartSpawningObstacles();
+        // }
         StartSpawningPickups();
         motorcycle.EnableMovement();
         background.StartFadeIn();
@@ -307,41 +324,66 @@ public class GameController : MonoBehaviour
             obstacleSpawnRate = 12;
             obstacleMinSpeed = 2f;
             obstacleMaxSpeed = 3f;
+            stateText.SetText("MINNESOTA");
+            quoteText.SetText(@"What you’re up against is the great unknown, the void of all Western thought. You need some ideas, some hypotheses. Traditional 
+scientific method, unfortunately, has never quite gotten around to say exactly where to pick up more of these hypotheses. 
+
+- Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance");
         }
         if (level == 2) {
             puzzleRows = 3;
             puzzleCols = 3;
-            obstacleSpawnRate = 10;
+            obstacleSpawnRate = 9;
             obstacleMinSpeed = 3f;
             obstacleMaxSpeed = 4f;
+            stateText.SetText("NORTH DAKOTA");
+            quoteText.SetText(@"If someone's ungrateful and you tell him he's ungrateful, okay, you've called him a name. You haven't solved anything. 
+
+- Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance");
         }
         if (level == 3) {
             puzzleRows = 3;
             puzzleCols = 4;
-            obstacleSpawnRate = 8;
-            obstacleMinSpeed = 3f;
+            obstacleSpawnRate = 6;
+            obstacleMinSpeed = 4f;
             obstacleMaxSpeed = 5f;
+            stateText.SetText("MONTANA");
+            quoteText.SetText(@"The truth knocks on the door and you say, Go away, I'm looking for the truth, and so it goes away. Puzzling.
+
+- Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance");
         }
         if (level == 4) {
             puzzleRows = 4;
             puzzleCols = 4;
-            obstacleSpawnRate = 6;
-            obstacleMinSpeed = 3.5f;
-            obstacleMaxSpeed = 5.5f;
+            obstacleSpawnRate = 4;
+            obstacleMinSpeed = 5.0f;
+            obstacleMaxSpeed = 6.0f;
+            stateText.SetText("IDAHO");
+            quoteText.SetText(@"You look at where you're going and where you are and it never makes sense, but then you look back at where you've been and a pattern seems to emerge.
+
+- Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance");
         }
         if (level == 5) {
             puzzleRows = 4;
             puzzleCols = 5;
-            obstacleSpawnRate = 8;
-            obstacleMinSpeed = 4f;
-            obstacleMaxSpeed = 6f;
+            obstacleSpawnRate = 3;
+            obstacleMinSpeed = 6f;
+            obstacleMaxSpeed = 7f;
+            stateText.SetText("OREGON");
+            quoteText.SetText(@"Sometimes it's a little better to travel than to arrive
+
+- Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance");
         }
         if (level == 6) {
             puzzleRows = 4;
             puzzleCols = 6;
-            obstacleSpawnRate = 7;
-            obstacleMinSpeed = 5.5f;
-            obstacleMaxSpeed = 7.5f;
+            obstacleSpawnRate = 2;
+            obstacleMinSpeed = 7.0f;
+            obstacleMaxSpeed = 8.0f;
+            stateText.SetText("CALIFORNIA");
+            quoteText.SetText(@"Peace of mind produces right values, right values produce right thoughts. Right thoughts produce right actions and right actions produce work which will be a material reflection for others to see of the serenity at the center of it all.
+
+- Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance");
         }
     }
 }
